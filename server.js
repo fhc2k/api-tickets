@@ -36,7 +36,10 @@ app.set("io", io); // Puedes acceder a io desde req.app.get("io")
 app.use(helmet());
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: [
+            "http://localhost:5173",
+            "https://dulcet-fenglisu-4899cb.netlify.app",
+        ],
         credentials: true,
     })
 );
@@ -58,7 +61,7 @@ const startServer = async () => {
     await connectDB();
 
     server.listen(PORT, "0.0.0.0", () => {
-        console.log(`✅ Servidor escuchando en http://localhost:${PORT}`);
+        console.log(`✅ Servidor escuchando`);
     });
 
     setupTicketChangeStream(io);
