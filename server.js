@@ -36,10 +36,8 @@ app.set("io", io); // Puedes acceder a io desde req.app.get("io")
 app.use(helmet());
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://dulcet-fenglisu-4899cb.netlify.app",
-        ],
+        //http://localhost:5173
+        origin: "https://dulcet-fenglisu-4899cb.netlify.app",
         credentials: true,
     })
 );
