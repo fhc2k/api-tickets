@@ -34,10 +34,6 @@ const userSchema = mongoose.Schema(
             enum: ["active", "pending"],
             default: "pending",
         },
-        lastToken: {
-            type: String,
-            default: null,
-        },
     },
     {
         timestamps: true,

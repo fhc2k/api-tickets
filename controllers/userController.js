@@ -55,7 +55,7 @@ const registerGuest = asyncHandler(async (req, res) => {
         createdAt: createGuest.createdAt,
     };
 
-    sendWelcomeEmail(guest);
+    //sendWelcomeEmail(guest);
 
     res.status(201).json({
         message:
@@ -86,7 +86,7 @@ const registerTechnician = asyncHandler(async (req, res) => {
         throw new Error("Error al crear usuario, inténtalo más tarde.");
     }
 
-    sendWelcomeEmail(createTechnician);
+    //sendWelcomeEmail(createTechnician);
 
     res.status(201).json({
         message:
