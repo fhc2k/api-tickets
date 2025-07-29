@@ -32,21 +32,13 @@ const loginUser = asyncHandler(async (req, res) => {
 
     res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     res.json({
         message: "Login exitoso.",
-        user: {
-            _id: user._id,
-            name: user.name,
-            department: user.department,
-            email: user.email,
-            username: user.username,
-            role: user.role,
-            status: user.status,
-        },
+        user: user,
     });
 });
 
@@ -62,7 +54,7 @@ const getMe = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler((req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
     });
 
