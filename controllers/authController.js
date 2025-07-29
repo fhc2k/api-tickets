@@ -33,7 +33,7 @@ const loginUser = asyncHandler(async (req, res) => {
     res.cookie("token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     res.json({
@@ -55,7 +55,7 @@ const logoutUser = asyncHandler((req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
     });
 
     res.status(200).json({ message: "Sesión cerrada correctamente." });
