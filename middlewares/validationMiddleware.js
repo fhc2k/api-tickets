@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body, query, validationResult } = require("express-validator");
 
 const reservedWords = [
     "admin",
@@ -13,10 +13,7 @@ const reservedWords = [
 ];
 
 const validateLogin = [
-    body("email")
-        .trim()
-        .notEmpty()
-        .withMessage("El email es obligatorio."),
+    body("email").trim().notEmpty().withMessage("El email es obligatorio."),
     body("password")
         .trim()
         .notEmpty()
@@ -144,6 +141,48 @@ const validateCreateTicket = [
         .withMessage("El valor de description es obligatorio."),
 ];
 
+const validateGetUsers = [
+    query("role")
+        .optional()
+        .isIn(["guest", "technician"])
+        .withMessage(
+            'El role proporcionado no es válido. Solo se permite "guest" o "technician".'
+        ),
+    query("status")
+        .optional()
+        .isIn(["active", "pending"])
+        .withMessage(
+            "El status proporcionado no es válido. Solo se permite 'active' o 'pending'."
+        ),
+    query("department")
+        .optional()
+        .isString()
+        .withMessage("El valor department debe ser un string."),
+];
+
+const validateGetTickets = [
+    query("status")
+        .optional()
+        .isIn(["active", "pending"])
+        .withMessage(
+            "El status proporcionado no es válido. Solo se permite 'active' o 'pending'."
+        ),
+    query("department")
+        .optional()
+        .isString()
+        .withMessage("El valor department debe ser un string."),
+
+    query("createdBy")
+        .optional()
+        .isMongoId()
+        .withMessage("El valor createdBy debe ser un ID de usuario válido."),
+
+    query("assignedTo")
+        .optional()
+        .isMongoId()
+        .withMessage("El valor assignedTo debe ser un ID de usuario válido."),
+];
+
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
 
@@ -160,5 +199,7 @@ module.exports = {
     validateRegisterTechnician,
     validateApproveOrRejectUser,
     validateCreateTicket,
+    validateGetUsers,
+    validateGetTickets,
     handleValidationErrors,
 };

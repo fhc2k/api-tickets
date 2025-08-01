@@ -74,24 +74,23 @@ const registerTechnician = asyncHandler(async (req, res) => {
         throw new Error("Ya existe una usuario asociado a este correo.");
     }
 
-    const createTechnician = await Technician.create({
+    const newTechnician = await userService.createTechnician({
         name,
         email,
         password,
-        role,
     });
 
-    if (!createTechnician) {
+    if (!newTechnician) {
         res.status(400);
         throw new Error("Error al crear usuario, inténtalo más tarde.");
     }
 
-    //sendWelcomeEmail(createTechnician);
+    //sendWelcomeEmail(newTechnician);
 
     res.status(201).json({
         message:
             "Técnico registrado exitosamente. Espera la aprobación del administrador.",
-        user: createTechnician,
+        user: newTechnician,
     });
 });
 
@@ -136,29 +135,34 @@ const getUser = asyncHandler(async (req, res) => {
     res.status(200).json(user);
 });
 
-const getAllGuests = asyncHandler(async (req, res) => {
-    const users = await Guest.find({})
+const getUsers = asyncHandler(async (req, res) => {
+    const { role, status, department } = req.query;
+
+    const query = {};
+
+    if (role) {
+        query.role = role;
+    } else {
+        query.role = { $ne: "admin" };
+    }
+
+    if (status) {
+        query.status = status;
+    }
+
+    if (department) {
+        queryFilters.department = department;
+    }
+
+    const users = await User.find(query)
         .select("-password")
         .sort({ createdAt: -1 });
 
     res.status(200).json(users);
 });
 
-const getAllTechnicians = asyncHandler(async (req, res) => {
-    const technicians = await Technician.find({})
-        .select("-password")
-        .sort({ createdAt: -1 });
-
-    res.status(200).json(technicians);
-});
-
 const deleteUser = asyncHandler(async (req, res) => {
     const userId = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-        res.status(400);
-        throw new Error("ID de usuario inválido.");
-    }
 
     const user = await User.findById(userId);
 
@@ -186,7 +190,6 @@ module.exports = {
     registerTechnician,
     approveOrRejectUser,
     deleteUser,
+    getUsers,
     getUser,
-    getAllGuests,
-    getAllTechnicians,
 };

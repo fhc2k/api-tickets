@@ -31,9 +31,8 @@ const getOwnTickets = asyncHandler(async (req, res) => {
 
 const getAssignedTickets = asyncHandler(async (req, res) => {
     const { _id: technicianId } = req.user;
-    const filter = { assignedTo: technicianId };
 
-    const tickets = await Ticket.find(filter)
+    const tickets = await Ticket.find({ assignedTo: technicianId })
         .populate("assignedTo", "name email")
         .populate("createdBy", "name email");
 
@@ -125,40 +124,50 @@ const getTicketById = asyncHandler(async (req, res) => {
     const { id: ticketId } = req.params;
     const { _id: userId, role: userRole } = req.user;
 
-    const ticket = await Ticket.findById(ticketId)
+    const query = { _id: ticketId };
+
+    if (userRole !== "admin") {
+        query.$or = [{ createdBy: userId }, { assignedTo: userId }];
+    }
+
+    const ticket = await Ticket.findOne(query)
         .populate("assignedTo", "name email")
-        .populate("createdBy", "name email")
-        .populate("department", "name");
+        .populate("createdBy", "name email");
 
     if (!ticket) {
         res.status(404);
-        throw new Error("Ticket no encontrado.");
+        throw new Error("Ticket no encontrado o no tienes permiso para verlo.");
     }
 
-    if (userRole === "admin") {
-        return res.status(200).json(ticket);
-    }
-
-    if (
-        userRole === "technician" &&
-        ticket.assignedTo?._id.toString() === userId.toString()
-    ) {
-        return res.status(200).json(ticket);
-    }
-
-    if (
-        userRole === "guest" &&
-        ticket.createdBy?._id.toString() === userId.toString()
-    ) {
-        return res.status(200).json(ticket);
-    }
-
-    res.status(403);
-    throw new Error("No tienes permiso para ver este ticket.");
+    res.status(200).json(ticket);
 });
 
 const getAllTickets = asyncHandler(async (req, res) => {
-    const tickets = await Ticket.find({})
+    const { department, status, role, createdBy, assignedTo } = req.query;
+
+    const query = {};
+
+    if (role) {
+        query.role = role;
+    }
+
+    if (status) {
+        query.status = status;
+    }
+
+    if (department) {
+        query.department = { $regex: department, $options: "i" };
+    }
+
+    if (createdBy) {
+        query.createdBy = createdBy;
+    }
+    
+    if (assignedTo) {
+        query.assignedTo = assignedTo;
+    }
+
+    const tickets = await Ticket.find(query)
         .populate("assignedTo", "name email")
         .populate("createdBy", "name email");
 

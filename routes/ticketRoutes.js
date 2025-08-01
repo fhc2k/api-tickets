@@ -8,6 +8,7 @@ const {
     assignTechnicianToTicket,
     getAllTickets,
     deleteTicket,
+    getTicketById,
 } = require("../controllers/ticketController");
 
 const {
@@ -19,6 +20,7 @@ const {
 
 const {
     validateCreateTicket,
+    validateGetTickets,
     handleValidationErrors,
 } = require("../middlewares/validationMiddleware");
 
@@ -51,7 +53,7 @@ router.get(
 );
 
 router.patch(
-    "/assigned/:id/close",
+    "/my-assigned/:id/close",
     protect,
     authorizeRoles("technician"),
     verifyActiveStatus,
@@ -65,7 +67,16 @@ router.patch(
     assignTechnicianToTicket
 );
 
-router.get("/all-tickets", protect, authorizeRoles("admin"), getAllTickets);
+router.get(
+    "/",
+    protect,
+    authorizeRoles("admin"),
+    validateGetTickets,
+    handleValidationErrors,
+    getAllTickets
+);
+
+router.get("/:id", protect, getTicketById);
 
 router.delete("/:id", protect, authorizeRoles("guest", "admin"), deleteTicket);
 

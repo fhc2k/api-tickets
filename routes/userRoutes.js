@@ -3,10 +3,9 @@ const {
     registerGuest,
     registerTechnician,
     approveOrRejectUser,
+    getUsers,
     getUser,
-    getAllGuests,
     deleteUser,
-    getAllTechnicians,
 } = require("../controllers/userController");
 const {
     protect,
@@ -19,6 +18,7 @@ const {
     validateRegisterGuest,
     validateRegisterTechnician,
     validateApproveOrRejectUser,
+    validateGetUsers,
     handleValidationErrors,
 } = require("../middlewares/validationMiddleware");
 
@@ -46,21 +46,23 @@ router.patch(
     approveOrRejectUser
 );
 
-router.delete("/delete/:id", protect, authorizeRoles("admin"), deleteUser);
+router.delete("/:id", protect, authorizeRoles("admin"), deleteUser);
 
-router.get("/all-guest", protect, authorizeRoles("admin"), getAllGuests);
-router.get(
-    "/all-technicians",
-    protect,
-    authorizeRoles("admin"),
-    getAllTechnicians
-);
 router.get(
     "/:id",
     protect,
     authorizeSelfOrRole("admin"),
     verifyActiveStatus,
     getUser
+);
+
+router.get(
+    "/",
+    protect,
+    authorizeRoles("admin"),
+    validateGetUsers,
+    handleValidationErrors,
+    getUsers
 );
 
 module.exports = router;
